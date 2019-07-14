@@ -1,0 +1,74 @@
+strlen_2 reg reg {
+  				
+  					co=011011,
+					nwords=1,
+					reg=reg(25,21),
+  					reg=reg(20,16),
+              {
+              
+				(SELA=10000, T9=1, C5=1), #La direccion dada es guardada en RT2
+			    (T5=1, C0=1), #Almacenamos en MAR la direccion para posterior lectura
+			  
+              
+			  BUCLE: 
+			  (TA=1, R=1, BW=00, M1=1, C1=1), #Se lee un byte 
+              (T1=1, C4=1), #Guardamos el contenido de dicho byte en RT1
+              
+			  (MR, MC, MB=11, MA=1, SELCOP=1011, SelP=11, M7, C7), #Restamos una unidad al contenido
+			  (C= 0111, B=0, A0=0, MADDR= FIN), #Analizamos el resultado obtenido gracias a la ALU
+              
+			  #Si hemos llegado a este punto del codigo es porque el byte leido no es 0
+			  (T5, C4), #Transladamos el contenido de RT2 a RT1
+			  (MA=1, MB=11, MC=1, SELCOP=1010, SELP=11, MR, M7, C7, T6, C5), #Incrementamos en una unidad para acceder a la siguiente posicion de memoria
+			  (T5,C0), #Almacenamos la direccion en MAR para su posterior lectura
+			  
+			  (A0=0, B=1, C=0, MADDR=BUCLE), #Se llama a BUCLE de manera recursiva 
+			  
+              FIN:
+			  #La llegada aqui indica que la cadena ha finalizado
+              (T5,C4), #Movemos nuevamente a direccion actual a RT1
+              
+			  (SelB=10000,MA=1,MB=00,MR=0,MC,SELCOP=1011, SELP=11, M7,C7,T6, C6), #Realizamos la resta de la direccion inicial dada y la actual cpn vistas a saber cuantos bytes hemos leido
+			  (SELC=10101, LC=1), #El resultado se almacena en el registro destino
+			  (A0=1, B=1, C=0) #Finalizamos 
+              
+			  
+            }
+}
+
+skipasciicode_2 reg reg val {
+  
+            co=011010,
+            nwords=1,
+            reg=reg(25,21),
+            reg=reg(20,16),
+            val=inm(7,0),
+              
+            {		
+                (SELA=10000, T9=1, C4=1, C0=1), #Se coloca la direccion de inicio
+              	(SELC=11011, MR, LC, OFFSET=0, SIZE=01000, T3) #El valor se guarda en k1
+              
+              	loop2:
+                  (TA=1, R, BW=00, M1, C1), #Se procede a la lectura de un byte
+                  (T1, C5), #El contenido leido se deja en RT2
+
+                  (SELA=11011, MR, MB=01, MC=1, SELCOP=1011, SELP=11, M7, C7), #Se restan los caracteres para comprobar si son o no el mismo
+                  (A0=0, B=1, C=110, MADDR=fin2), #Si son iguales continuamos, si son diferentes el flujo salta a fin2
+
+                  (MA=1, MB=11, MC=1, SELCOP=1010, SELP=11, M7, C7, T6, C4, C0), #Incrementamos a la siguiente direccion
+                  (A0=0, B=1, C=0, MADDR=loop2), #Se llama recursivamente al bucle loop2
+              
+      					fin2:
+              	
+                  (SELC=10101, LC, T4), #Se mueve la direccion a el registro destino 
+                  (A0=1, B=1, C=0) #Finalizamos
+            }
+}
+
+
+
+
+
+
+
+

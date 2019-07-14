@@ -1,0 +1,53 @@
+
+			strlen_1:
+				
+				#Suponemos que la direccion de inicio de la cadena se pasa por el parametro a0
+				move $t4, $a0 		#t4 almacenara la direccion de inicio del vector
+				  
+				li $t0, 0				#t0 almacenara el char
+				li $t1, 0 				#t1 sera aux almacenara el numero 0
+				li $t2, 1				#t2 sera aux de desplazamiento
+				li $t3, 0 				#t3 sera contador de los char del vector 
+				  
+				  
+				  
+				lbu $t0, ($t4)	#Se carga el primer byte 
+				  
+				bucle:  
+							beq $t0, $t1, fin		#Se comprueba si es el final de la cadena
+							add $t3, $t3, $t2   	#Si ha entrado en el bucle, equivale a que ha reconocido un char, incrementamos contador
+							add $t4, $t4, $t2		#Pasamos a la siguiente posicion en memoria
+							lbu $t0, ($t4)			#Cargamos el contenido de la direccion para su posterior comparacion
+							b bucle 				#Bifurcacion recursiva a la etiqueta bucle
+						  
+				fin:	  move $v0, $t3			#Devolvemos el numero de char de la cadena 
+						  
+
+
+			  
+			skipspaces_1:
+				
+				
+				#Suponemos que se deja en a0 la direccion de inicio de la cadena
+				move $t4, $a0 				#t4 almacenara la direccion de inicio del vector
+			  	
+				li $t0, 0							#t0 almacenara el char
+			  
+				li $t1, ' '						#t1 sera aux almacenara un espacio
+							
+				
+				li $t2, 1
+			 
+				lbu $t0, ($t4)				#Se carga el primer byte 
+			  
+				bucle:  
+						bne $t0, $t1, fin		#Se comprueba si estamos leyendo un espacio
+						add $t4, $t4, $t2		#Pasamos a la siguiente posicion en memoria
+						lbu $t0, ($t4)			#Cargamos el contenido de la direccion para su posterior comparacion
+						b bucle 				#Bifurcacion recursiva a la etiqueta bucle
+					  
+				fin:	move $v0, $t4			#Devolvemos la direccion que almacena el primer char distinto de un espacio de la cadena 
+					  
+
+						  
+
